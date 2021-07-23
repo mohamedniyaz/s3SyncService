@@ -1,0 +1,6 @@
+__pycache__/*
+.idea/*
+venv/*
+error.log
+info.log
+test.py
