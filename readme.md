@@ -35,4 +35,7 @@ Debug Service
     the name info.log and error.log
 
 Delete Service
+* Find out the pid of the service and kill
+  * sc queryex servicename
+  * taskkill /F /PID servicepid
 * sc delete servicename
