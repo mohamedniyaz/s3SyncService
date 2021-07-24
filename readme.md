@@ -9,7 +9,8 @@ Steps to install aws cli
 Steps to install
 * install python
 * open system environment variables
-* Make sure to set python home dir is to system path variable
+* Make sure to set python home dir to system path variable
+* Make sure to set pip home dir to system path variable
 * download the code from git 
 * open command prompt as admin
 * Navigate into the code dir and do the following
@@ -30,7 +31,7 @@ Debug Service
 * logs can be found in the service root dir 
   * run services.msc
   * double click on the service
-  * "Path to executable" is where the logs are found under 
+  * "Path to executable" is where the logs are afound under 
     the name info.log and error.log
 
 Delete Service
