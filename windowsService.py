@@ -55,8 +55,8 @@ class SMWinservice(win32serviceutil.ServiceFramework):
         Called when the service is asked to stop
         '''
         self.stop()
-        self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
-        win32event.SetEvent(self.hWaitStop)
+        # self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
+        # win32event.SetEvent(self.hWaitStop)
 
     def SvcDoRun(self):
         '''
