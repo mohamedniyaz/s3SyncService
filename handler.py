@@ -18,51 +18,66 @@ class S3Service(SMWinservice):
     _svc_display_name_ = "S3 Sync Service"
     _svc_description_ = "Service to Sync files to S3"
 
-    def start(self):
-        self.isrunning = True
-
-    def stop(self):
-        self.isrunning = False
+    def killProcess(self,type):
         try:
-            pid = None
             for proc in psutil.process_iter():
                 if proc.name() == 'aws.exe':
                     pid = proc.pid
                     log.info(f' -- kill aws cli pid {pid}')
                     proc.kill
                     log.info(f' -- kill aws cli pid {pid} complete')
-            process = psutil.win_service_get(self._svc_name_)
-            pid = None
-            pid = process.pid()
-            p = psutil.Process(pid)
-            if p is not None:
-                log.info(f' -- kill the s3SyncService pid {pid}')
-                p.kill()
-                log.info(f' -- kill the s3SyncService pid complete {pid}')
+                else:
+                    log.info(f' -- No aws cli to kill')
+            if type == 'stop':
+                process = psutil.win_service_get(self._svc_name_)
+                pid = process.pid()
+                p = psutil.Process(pid)
+                if p is not None:
+                    log.info(f' -- kill the s3SyncService pid {pid}')
+                    p.kill()
+                    log.info(f' -- kill the s3SyncService pid complete {pid}')
+
         except Exception as err:
             log.error(f' -- s3SyncService error {err}')
             sys.exit(-1)
             log.info(f' -- Stopping the s3SyncService')
 
+
+    def start(self):
+        self.isrunning = True
+        self.killProcess('start')
+
+    def stop(self):
+        self.isrunning = False
+        self.killProcess('stop')
+
     def main(self):
+        pid = None
         try:
             while self.isrunning:
-                log.info(f' -- s3SyncService started syncing files')
-                for path in local_path:
-                    log.info(f' -- Syncing  {path}')
-                    sync_cmd = 'aws s3 sync ' + path + ' ' + s3_path
-                    log.info(f' -- {sync_cmd}')
-                    run = True
-                    command = Popen(sync_cmd, stdout=PIPE, shell=True)
-                    while run is True:
-                        output = command.stdout.readline()
-                        if not output and command.poll() is not None:
-                            run = False
-                        if output:
-                            log.info(f' -- Syncing  completed {output}')
+                for proc in psutil.process_iter():
+                    if proc.name() == 'aws.exe':
+                        pid = proc.pid
+                if pid is None or pid == "":
+                    log.info(f' -- s3SyncService started syncing files')
+                    for path in local_path:
+                        log.info(f' -- Syncing  {path}')
+                        sync_cmd = 'aws s3 sync ' + path + ' ' + s3_path
+                        log.info(f' -- {sync_cmd}')
+                        run = True
+                        command = Popen(sync_cmd, stdout=PIPE, shell=True)
+                        while run is True:
+                            output = command.stdout.readline()
+                            if not output and command.poll() is not None:
+                                run = False
+                            if output:
+                                log.info(f' -- Syncing  completed {output}')
+                            time.sleep(10)
 
-                    log.info(f' -- Syncing  completed {path}')
-                log.info(f' -- s3SyncService completed syncing files')
+                        log.info(f' -- Syncing  completed {path}')
+                    log.info(f' -- s3SyncService completed syncing files')
+                else:
+                    log.info(f' -- s3SyncService started earlier is still running')
                 time.sleep(sync_time)
         except Exception as err:
             log.error(f' -- s3SyncService error {err}')

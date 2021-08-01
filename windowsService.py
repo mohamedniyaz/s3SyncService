@@ -82,6 +82,13 @@ class SMWinservice(win32serviceutil.ServiceFramework):
         '''
         pass
 
+    def killProcess(self,type):
+        '''
+        Override to add logic in start and stop
+        eg. invalidating running condition
+        '''
+        pass
+
     def main(self):
         '''
         Main class to be ovverridden to add logic
